@@ -9,21 +9,29 @@
 /* Begin PBXBuildFile section */
 		892232752926E3E4004E28A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892232742926E3E4004E28A2 /* AppDelegate.swift */; };
 		892232772926E3E4004E28A2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892232762926E3E4004E28A2 /* SceneDelegate.swift */; };
-		892232792926E3E4004E28A2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892232782926E3E4004E28A2 /* ViewController.swift */; };
+		892232792926E3E4004E28A2 /* ImagesListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 892232782926E3E4004E28A2 /* ImagesListViewController.swift */; };
 		8922327C2926E3E4004E28A2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8922327A2926E3E4004E28A2 /* Main.storyboard */; };
 		8922327E2926E3E6004E28A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8922327D2926E3E6004E28A2 /* Assets.xcassets */; };
 		892232812926E3E6004E28A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8922327F2926E3E6004E28A2 /* LaunchScreen.storyboard */; };
+		893487EA2932B4D800158E03 /* ImagesListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893487E92932B4D800158E03 /* ImagesListCell.swift */; };
+		893487EE2932C40200158E03 /* YS Display-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 893487EC2932C40100158E03 /* YS Display-Medium.ttf */; };
+		893487EF2932C40200158E03 /* YS Display-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 893487ED2932C40100158E03 /* YS Display-Bold.ttf */; };
+		893487F329354BF600158E03 /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893487F229354BF600158E03 /* GradientView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		892232712926E3E4004E28A2 /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		892232742926E3E4004E28A2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		892232762926E3E4004E28A2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		892232782926E3E4004E28A2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		892232782926E3E4004E28A2 /* ImagesListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListViewController.swift; sourceTree = "<group>"; };
 		8922327B2926E3E4004E28A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8922327D2926E3E6004E28A2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		892232802926E3E6004E28A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		892232822926E3E6004E28A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		893487E92932B4D800158E03 /* ImagesListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesListCell.swift; sourceTree = "<group>"; };
+		893487EC2932C40100158E03 /* YS Display-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Medium.ttf"; sourceTree = "<group>"; };
+		893487ED2932C40100158E03 /* YS Display-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "YS Display-Bold.ttf"; sourceTree = "<group>"; };
+		893487F229354BF600158E03 /* GradientView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,13 +66,25 @@
 			children = (
 				892232742926E3E4004E28A2 /* AppDelegate.swift */,
 				892232762926E3E4004E28A2 /* SceneDelegate.swift */,
-				892232782926E3E4004E28A2 /* ViewController.swift */,
 				8922327A2926E3E4004E28A2 /* Main.storyboard */,
 				8922327D2926E3E6004E28A2 /* Assets.xcassets */,
+				893487ED2932C40100158E03 /* YS Display-Bold.ttf */,
+				893487EC2932C40100158E03 /* YS Display-Medium.ttf */,
 				8922327F2926E3E6004E28A2 /* LaunchScreen.storyboard */,
 				892232822926E3E6004E28A2 /* Info.plist */,
+				893487EB2932B52900158E03 /* ImagesList */,
 			);
 			path = ImageFeed;
+			sourceTree = "<group>";
+		};
+		893487EB2932B52900158E03 /* ImagesList */ = {
+			isa = PBXGroup;
+			children = (
+				892232782926E3E4004E28A2 /* ImagesListViewController.swift */,
+				893487E92932B4D800158E03 /* ImagesListCell.swift */,
+				893487F229354BF600158E03 /* GradientView.swift */,
+			);
+			path = ImagesList;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -126,6 +146,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				892232812926E3E6004E28A2 /* LaunchScreen.storyboard in Resources */,
+				893487EE2932C40200158E03 /* YS Display-Medium.ttf in Resources */,
+				893487EF2932C40200158E03 /* YS Display-Bold.ttf in Resources */,
 				8922327E2926E3E6004E28A2 /* Assets.xcassets in Resources */,
 				8922327C2926E3E4004E28A2 /* Main.storyboard in Resources */,
 			);
@@ -138,7 +160,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				892232792926E3E4004E28A2 /* ViewController.swift in Sources */,
+				893487F329354BF600158E03 /* GradientView.swift in Sources */,
+				892232792926E3E4004E28A2 /* ImagesListViewController.swift in Sources */,
+				893487EA2932B4D800158E03 /* ImagesListCell.swift in Sources */,
 				892232752926E3E4004E28A2 /* AppDelegate.swift in Sources */,
 				892232772926E3E4004E28A2 /* SceneDelegate.swift in Sources */,
 			);
