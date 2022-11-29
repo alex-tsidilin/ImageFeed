@@ -3,12 +3,6 @@ import UIKit
 
 class ImagesListViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        photosName = Array(0...20).map{ "\($0)" }
-    }
-
-    @IBOutlet private var tableView: UITableView!
     private var photosName = [String]()
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
@@ -17,11 +11,19 @@ class ImagesListViewController: UIViewController {
         return formatter
     }()
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        photosName = Array(0..<20).map{ "\($0)" }
+    }
+
+    @IBOutlet private var tableView: UITableView!
+
+    
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         // Меняю картинки в ячейках
         if indexPath.row < photosName.count {
             cell.cellImage.image = UIImage(named: photosName[indexPath.row] ) ?? UIImage()
-        } else { }
+        }
         
         // Меняю дату в подписи
         cell.dateLabel.text = dateFormatter.string(from: Date())
@@ -29,25 +31,24 @@ class ImagesListViewController: UIViewController {
         // Для каждой четной ячейки установливаю включённый лайк
         let tintedImage = UIImage(systemName: "heart.fill")?.withRenderingMode(.alwaysTemplate)
         cell.likeButton.setImage(tintedImage, for: .normal)
-        cell.likeButton.tintColor = UIColor.white.withAlphaComponent(0.5)
         cell.likeButton.setTitle("", for: .normal)
-        if indexPath.row.isMultiple(of: 2) { } else {
-            cell.likeButton.tintColor = UIColor(red: 245/255.0, green: 107/255.0, blue: 108/255.0, alpha: 1)
-        }
+        let likeTintColor: UIColor = indexPath.row.isMultiple(of: 2)
+           ? .white.withAlphaComponent(0.5)
+           :  UIColor(red: 245/255.0, green: 107/255.0, blue: 108/255.0, alpha: 1)
+        cell.likeButton.tintColor = likeTintColor
     }
 }
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
     
-    // Делаю так, чтобы картинка помащалась полностью
+    // Делаю так, чтобы картинка помещалась полностью
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.row < photosName.count {
-            let imageHeight: Int = Int(UIImage(named: photosName[indexPath.row])?.size.height ?? 0)
-            let imageWidth: Int = Int(UIImage(named: photosName[indexPath.row])?.size.width ?? 0)
-            let tableViewWidth: Int = Int(tableView.bounds.width)
-            return CGFloat(tableViewWidth/imageWidth*imageHeight)
-        } else { return 0.0 }
+        guard indexPath.row < photosName.count else { return 0 }
+        let imageHeight = Float(UIImage(named: photosName[indexPath.row])?.size.height ?? 0)
+        let imageWidth = Float(UIImage(named: photosName[indexPath.row])?.size.width ?? 0)
+        let tableViewWidth = Float(tableView.bounds.width)
+        return CGFloat(tableViewWidth/imageWidth*imageHeight)
     }
 }
 

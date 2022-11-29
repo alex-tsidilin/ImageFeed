@@ -4,8 +4,8 @@ import UIKit
 
 class GradientView: UIView {
     
-    private var startColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 0)
-    private var endColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 0.2)
+    private let startColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 0)
+    private let endColor = UIColor(red: 26/255.0, green: 27/255.0, blue: 34/255.0, alpha: 0.2)
     private let gradientLayer = CAGradientLayer()
     
     override init(frame: CGRect) {
