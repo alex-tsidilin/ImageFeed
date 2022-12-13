@@ -76,12 +76,12 @@
 				893487EC2932C40100158E03 /* YS Display-Medium.ttf */,
 				8922327F2926E3E6004E28A2 /* LaunchScreen.storyboard */,
 				892232822926E3E6004E28A2 /* Info.plist */,
-				893487EB2932B52900158E03 /* ImagesList */,
+				893487EB2932B52900158E03 /* Controllers */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
 		};
-		893487EB2932B52900158E03 /* ImagesList */ = {
+		893487EB2932B52900158E03 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				892232782926E3E4004E28A2 /* ImagesListViewController.swift */,
@@ -90,7 +90,7 @@
 				8905134029394CA7000357B6 /* ProfileViewController.swift */,
 				89051342294278E9000357B6 /* SingleImageViewController.swift */,
 			);
-			path = ImagesList;
+			path = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

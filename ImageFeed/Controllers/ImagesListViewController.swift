@@ -61,9 +61,9 @@ extension ImagesListViewController: UITableViewDelegate {
     // Делаю так, чтобы картинка помещалась полностью
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard indexPath.row < photosName.count else { return 0 }
-        let imageHeight = Float(UIImage(named: photosName[indexPath.row])?.size.height ?? 0)
-        let imageWidth = Float(UIImage(named: photosName[indexPath.row])?.size.width ?? 0)
-        let tableViewWidth = Float(tableView.bounds.width)
+        let imageHeight: CGFloat = UIImage(named: photosName[indexPath.row])?.size.height ?? 0
+        let imageWidth: CGFloat = UIImage(named: photosName[indexPath.row])?.size.width ?? 0
+        let tableViewWidth = tableView.bounds.width
         return CGFloat(tableViewWidth/imageWidth*imageHeight)
     }
 }
