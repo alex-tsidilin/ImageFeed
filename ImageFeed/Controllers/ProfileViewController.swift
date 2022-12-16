@@ -37,7 +37,7 @@ final class ProfileViewController: UIViewController {
     func createProfileImage(profileImage: UIImageView) {
         profileImage.translatesAutoresizingMaskIntoConstraints = false
         profileImage.image = UIImage(named: "Photo")
-        profileImage.tintColor = .gray
+        profileImage.layer.cornerRadius = profileImage.frame.height / 2
         view.addSubview(profileImage)
     }
     
