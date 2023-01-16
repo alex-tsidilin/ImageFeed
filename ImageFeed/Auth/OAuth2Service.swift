@@ -21,14 +21,14 @@ class OAuth2Service {
         case codeError
     }
     
-    let unsplashAuthorizePostURLString = "https://unsplash.com/oauth/token"
+    private let unsplashAuthorizePostURLString = "https://unsplash.com/oauth/token"
 
-    func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void){
+    func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
         var urlComponents = URLComponents(string: self.unsplashAuthorizePostURLString)!
         urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: AccessKey),
-            URLQueryItem(name: "client_secret", value: SecretKey),
-            URLQueryItem(name: "redirect_uri", value: RedirectURI),
+            URLQueryItem(name: "client_id", value: Constants.accessKey),
+            URLQueryItem(name: "client_secret", value: Constants.secretKey),
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
             URLQueryItem(name: "code", value: code),
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]

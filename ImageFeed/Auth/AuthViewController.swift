@@ -7,7 +7,11 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController {
     
-    let ShowWebViewSegueIdentifier = "ShowWebView"
+    private let showWebViewSegueIdentifier = "ShowWebView"
+    private let oAuth2Service = OAuth2Service()
+    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let splashViewController = SplashViewController()
+    
     weak var delegate: AuthViewControllerDelegate?
     
     @IBOutlet weak var authButton: UIButton!
@@ -28,10 +32,10 @@ final class AuthViewController: UIViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == ShowWebViewSegueIdentifier {
+        if segue.identifier == showWebViewSegueIdentifier {
             guard
                 let webViewViewController = segue.destination as? WebViewViewController
-            else { fatalError("Failed to prepare for \(ShowWebViewSegueIdentifier)") }
+            else { fatalError("Failed to prepare for \(showWebViewSegueIdentifier)") }
             webViewViewController.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
@@ -40,12 +44,25 @@ final class AuthViewController: UIViewController {
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {
-    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        delegate?.authViewController(self, didAuthenticateWithCode: code)
-    }
-    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         dismiss(animated: true)
     }
+    
+    func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
+            guard let self = self else { return }
+                
+            switch result {
+                case .success(let token):
+                    print("Your token - \(token)")
+                    self.oAuth2TokenStorage.token = token
+                    self.delegate?.authViewController(self, didAuthenticateWithCode: code)
+                    self.splashViewController.switchToTabBarController()
+                case .failure(let error):
+                    print(error)
+                }
+        }
+    }
 }
+
 
