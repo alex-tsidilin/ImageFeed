@@ -6,8 +6,7 @@ final class SplashViewController: UIViewController {
     //MARK: - Properties
     
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    private let tokenStorage = OAuth2TokenStorage()
-    private let oauth2Service = OAuth2Service()
+    let tokenStorage = OAuth2TokenStorage()
 
     //MARK: - LifeCicle
     override func viewWillAppear(_ animated: Bool) {
@@ -22,8 +21,10 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if tokenStorage.token != nil {
+            print("В памяти есть токен \(tokenStorage.token!)")
             switchToTabBarController()
         } else {
+            print("Токена нет, переключаем на аутентификацию")
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
@@ -54,12 +55,12 @@ extension SplashViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
-        dismiss(animated: true)
-            //self.fetchOAuthToken(code)
+        vc.dismiss(animated: true)
+        switchToTabBarController()
     }
 
 //    private func fetchOAuthToken (_ code: String) {
-//        oauth2Service.fetchAuthToken(code: code) { [weak self] result in
+//        oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
 //            DispatchQueue.main.async {
 //                guard let self = self else {return}
 //                switch result {
