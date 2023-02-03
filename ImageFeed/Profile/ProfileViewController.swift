@@ -1,5 +1,6 @@
 
 import UIKit
+import ProgressHUD
 
 final class ProfileViewController: UIViewController {
     
@@ -8,14 +9,33 @@ final class ProfileViewController: UIViewController {
     let profileName = UILabel()
     let profileID = UILabel()
     let profileDescription = UILabel()
+    let profileService = ProfileService()
+    let profileImageService = ProfileImageService()
+    private let oAuth2TokenStorage = OAuth2TokenStorage()
+    private let profileStorage = ProfileStorage()
     
     override func viewDidLoad() {
+
         createProfileImage(profileImage: profileImage)
         createLogoutButton(logoutButton: logoutButton)
         createProfileName(profileName: profileName)
         createProfileID(profileID: profileID)
         createProfileDescription(profileDescription: profileDescription)
         
+        profileImageService.fetchProfileImageURL(username: profileStorage.username ?? "", token: oAuth2TokenStorage.token ?? "") { [weak self] result in
+ 
+            switch result {
+            case .success:
+                print("Снова успех")
+            case .failure:
+                print("Тут ошибка")
+                break
+            }
+        }
+        
+        
+        
+                
         NSLayoutConstraint.activate([
             profileImage.widthAnchor.constraint(equalToConstant: 70),
             profileImage.heightAnchor.constraint(equalToConstant: 70),
@@ -32,6 +52,8 @@ final class ProfileViewController: UIViewController {
             profileDescription.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
             profileDescription.topAnchor.constraint(equalTo: profileID.bottomAnchor, constant: 8),
         ])
+        
+        updateUserDataFromStorage()
     }
     
     func createProfileImage(profileImage: UIImageView) {
@@ -70,6 +92,12 @@ final class ProfileViewController: UIViewController {
         profileDescription.font = UIFont(name: "YS Display Medium", size: 13)
         profileDescription.textColor = .white
         view.addSubview(profileDescription)
+    }
+    
+    func updateUserDataFromStorage() {
+        self.profileName.text = self.profileStorage.name ?? "Имя Фамилия"
+        self.profileID.text = self.profileStorage.loginName ?? "@username"
+        self.profileDescription.text = self.profileStorage.bio ?? "Биография пользователя"
     }
     
 }

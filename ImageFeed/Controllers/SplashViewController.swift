@@ -1,5 +1,6 @@
 
 import UIKit
+import ProgressHUD
 
 final class SplashViewController: UIViewController {
 
@@ -7,6 +8,7 @@ final class SplashViewController: UIViewController {
     
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     let tokenStorage = OAuth2TokenStorage()
+    private let profileService = ProfileService.shared
 
     //MARK: - LifeCicle
     override func viewWillAppear(_ animated: Bool) {
@@ -22,11 +24,19 @@ final class SplashViewController: UIViewController {
         super.viewDidAppear(animated)
         if tokenStorage.token != nil {
             print("В памяти есть токен \(tokenStorage.token!)")
-            switchToTabBarController()
+            UIBlockingProgressHUD.show()
+            print("Показываем заглушку с загрузкой 1")
+            self.fetchProfile(token: tokenStorage.token!)
+            //switchToTabBarController()
         } else {
             print("Токена нет, переключаем на аутентификацию")
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        print("SplashView пропал")
     }
 
     //MARK: - Methods
@@ -35,6 +45,28 @@ final class SplashViewController: UIViewController {
         let tabBarController = UIStoryboard(name: "Main", bundle: .main)
             .instantiateViewController(withIdentifier: "TabBarViewController")
         window.rootViewController = tabBarController
+    }
+    
+    private func fetchProfile(token: String) {
+        profileService.fetchProfile(token: token) { [weak self] result in
+            guard let self = self else {
+                UIBlockingProgressHUD.dismiss()
+                print("Закрываем заглушку с загрузкой 1c")
+                return
+            }
+            
+            switch result {
+            case .success:
+                self.switchToTabBarController()
+                UIBlockingProgressHUD.dismiss()
+                print("Закрываем заглушку с загрузкой 1a")
+            case .failure:
+                UIBlockingProgressHUD.dismiss()
+                print("Закрываем заглушку с загрузкой 1b")
+                // TODO [Sprint 11] Показать ошибку
+                break
+            }
+        }
     }
 }
 
@@ -59,18 +91,4 @@ extension SplashViewController: AuthViewControllerDelegate {
         switchToTabBarController()
     }
 
-//    private func fetchOAuthToken (_ code: String) {
-//        oAuth2Service.fetchAuthToken(code: code) { [weak self] result in
-//            DispatchQueue.main.async {
-//                guard let self = self else {return}
-//                switch result {
-//                case .success:
-//                    self.switchToTabBarController()
-//                case .failure:
-//                    //TODO: Sprint 11
-//                    break
-//                }
-//            }
-//        }
-//    }
 }

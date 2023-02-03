@@ -15,41 +15,28 @@ struct OAuthTokenResponseBody: Codable {
     }
 }
 
-class OAuth2Service {
-
-    private enum NetworkError: Error {
-        case codeError
-    }
+final class OAuth2Service {
+    private let urlSession = URLSession.shared
+    private var task: URLSessionTask?
+    private var lastCode: String?
+    private var lastRequest: URLRequest?
     
-    private let unsplashAuthorizePostURLString = "https://unsplash.com/oauth/token"
-
-    func fetchAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        var urlComponents = URLComponents(string: self.unsplashAuthorizePostURLString)!
-        urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "client_secret", value: Constants.secretKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "grant_type", value: "authorization_code")
-        ]
-
-        let url = urlComponents.url!
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+    func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        
+        assert(Thread.isMainThread)
+        
+        if lastCode == code { return }
+        task?.cancel()
+        lastCode = code
+        
+        let request = makeRequest(code: code)
+        
+        if lastRequest != nil { return }
+        lastRequest = request
+        
+        let task = urlSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-
-                if let response = response as? HTTPURLResponse,
-                   response.statusCode < 200 || response.statusCode >= 300 {
-                    completion(.failure(NetworkError.codeError))
-                    return
-                }
-
+                
                 guard let data = data else { return }
 
                 do {
@@ -58,8 +45,33 @@ class OAuth2Service {
                 } catch let error {
                     completion(.failure(error))
                 }
+                
+                self.task = nil
+                if error != nil {
+                    self.lastCode = nil
+                    self.lastRequest = nil
+                }
             }
         }
+        self.task = task
         task.resume()
     }
+    
+    private func makeRequest(code: String) -> URLRequest {  // 19 Функция для создания URLRequest с заданным code.
+        let unsplashAuthorizePostURLString = "https://unsplash.com/oauth/token"
+        var urlComponents = URLComponents(string: unsplashAuthorizePostURLString)!
+        urlComponents.queryItems = [
+            URLQueryItem(name: "client_id", value: Constants.accessKey),
+            URLQueryItem(name: "client_secret", value: Constants.secretKey),
+            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "grant_type", value: "authorization_code")
+        ]
+        
+        guard let url = urlComponents.url else { fatalError("Failed to create URL") }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        return request
+    }
 }
+
