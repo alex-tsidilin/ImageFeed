@@ -18,13 +18,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        guard let _ = (scene as? UIWindowScene) else { return }
 //    }
     
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {        
         guard let scene = (scene as? UIWindowScene) else { return }
-        window = UIWindow(windowScene: scene)                   // 1
-        window?.rootViewController = UIStoryboard(              // 2
-            name: "Main",
-            bundle: .main
-        ).instantiateInitialViewController()
+        window = UIWindow(windowScene: scene)
+        window?.rootViewController = SplashViewController()
+        window?.makeKeyAndVisible()
     }
     
 
@@ -55,7 +53,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
     }
-
 
 }
 

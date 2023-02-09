@@ -13,25 +13,42 @@ final class AuthViewController: UIViewController {
     private let oAuth2Service = OAuth2Service()
     private let oAuth2TokenStorage = OAuth2TokenStorage()
     private let profileService = ProfileService()
+    private let authScreenImage = UIImageView()
+    //private let authButton = UIButton()
     
     weak var delegate: AuthViewControllerDelegate?
     
     @IBOutlet weak var authButton: UIButton!
-    
+        
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
     }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        .lightContent
-    }
-    
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         print("Загрузили экран AuthViewController")
         authButton.layer.masksToBounds = true
         authButton.layer.cornerRadius = 16
+        
+//        view.backgroundColor = UIColor(named: "YP Black")
+//        createAuthScreenImage()
+//        createAuthButton()
+//
+//        NSLayoutConstraint.activate([
+//            authScreenImage.widthAnchor.constraint(equalToConstant: 60),
+//            authScreenImage.heightAnchor.constraint(equalToConstant: 60),
+//            authScreenImage.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+//            authScreenImage.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+//            authButton.heightAnchor.constraint(equalToConstant: 48),
+//            authButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+//            authButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+//            authButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -90)
+//            ])
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        .lightContent
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -44,6 +61,34 @@ final class AuthViewController: UIViewController {
             super.prepare(for: segue, sender: sender)
         }
     }
+    
+//    func createAuthScreenImage() {
+//        self.authScreenImage.translatesAutoresizingMaskIntoConstraints = false
+//        self.authScreenImage.image = UIImage(named: "AuthIcon")
+//        view.addSubview(self.authScreenImage)
+//    }
+//
+//    func createAuthButton() {
+//        self.authButton.translatesAutoresizingMaskIntoConstraints = false
+//        self.authButton.layer.masksToBounds = true
+//        self.authButton.layer.cornerRadius = 16
+//        self.authButton.backgroundColor = .white
+//        self.authButton.setTitle("Войти", for: .normal)
+//
+//        let font = UIFont(name: "YS Display Bold", size: 17)
+//        self.authButton.titleLabel?.font = font
+//
+//        let color = UIColor(named: "YP Black")
+//        self.authButton.setTitleColor(color, for: .normal)
+//
+//        self.authButton.addTarget(self, action: #selector(handleAuthButtonTap), for: .touchUpInside)
+//        view.addSubview(self.authButton)
+//    }
+//
+//    @objc func handleAuthButtonTap() {
+//        let webViewController = WebViewViewController()
+//        present(webViewController, animated: true, completion: nil)
+//    }
 }
 
 extension AuthViewController: WebViewViewControllerDelegate {

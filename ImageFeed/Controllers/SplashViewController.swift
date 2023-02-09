@@ -10,7 +10,7 @@ final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
     private let profileService = ProfileService.shared
     private let profileImageService = ProfileImageService.shared
-    private let profileStorage = ProfileStorage()
+    private let loadingScreenImage = UIImageView()
 
     //MARK: - LifeCicle
     override func viewWillAppear(_ animated: Bool) {
@@ -21,9 +21,23 @@ final class SplashViewController: UIViewController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
+    
+    override func viewDidLoad() {
+        
+        view.backgroundColor = UIColor(named: "YP Black")
+        createLoadingScreenImage()
+        
+        NSLayoutConstraint.activate([
+            loadingScreenImage.widthAnchor.constraint(equalToConstant: 75),
+            loadingScreenImage.heightAnchor.constraint(equalToConstant: 78),
+            loadingScreenImage.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor),
+            loadingScreenImage.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor)
+            ])
+    }
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
         let token: String? = KeychainWrapper.standard.string(forKey: "Auth token")
         
         if token != nil {
@@ -34,7 +48,13 @@ final class SplashViewController: UIViewController {
             //switchToTabBarController()
         } else {
             print("Токена нет, переключаем на аутентификацию")
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else { return }
+            //let authViewController = AuthViewController()
+            authViewController.delegate = self
+            authViewController.modalPresentationStyle = .fullScreen
+            present(authViewController, animated: true)
+            //performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
     
@@ -106,22 +126,30 @@ final class SplashViewController: UIViewController {
             }
         }
     }
-}
-
-//MARK: - Extensions
-extension SplashViewController {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard
-                let navigationController = segue.destination as? UINavigationController,
-                let viewController = navigationController.viewControllers[0] as? AuthViewController
-            else {fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
+    
+    func createLoadingScreenImage() {
+        self.loadingScreenImage.translatesAutoresizingMaskIntoConstraints = false
+        self.loadingScreenImage.image = UIImage(named: "VectorLoadingScreen")
+        view.addSubview(self.loadingScreenImage)
     }
 }
+
+
+
+//MARK: - Extensions
+//extension SplashViewController {
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == showAuthenticationScreenSegueIdentifier {
+//            guard
+//                let navigationController = segue.destination as? UINavigationController,
+//                let viewController = navigationController.viewControllers[0] as? AuthViewController
+//            else {fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
+//            viewController.delegate = self
+//        } else {
+//            super.prepare(for: segue, sender: sender)
+//        }
+//    }
+//}
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {

@@ -18,6 +18,8 @@ final class ProfileViewController: UIViewController {
     private var profileImageServiceObserver: NSObjectProtocol?
     
     override func viewDidLoad() {
+        
+        view.backgroundColor = UIColor(named: "YP Black")
 
         createProfileImage(profileImage: profileImage)
         createLogoutButton(logoutButton: logoutButton)
