@@ -33,31 +33,26 @@ final class OAuth2Service {
         
         if lastRequest != nil { return }
         lastRequest = request
-        
-        let task = urlSession.dataTask(with: request) { data, response, error in
+                
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            guard let self = self else { return }
             DispatchQueue.main.async {
-                
-                guard let data = data else { return }
-
-                do {
-                    let jsonData = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    completion(.success(jsonData.accessToken))
-                } catch let error {
+                switch result {
+                case .success(let decodedData):
+                    completion(.success(decodedData.accessToken))
+                    self.task = nil
+                case .failure(let error):
                     completion(.failure(error))
-                }
-                
-                self.task = nil
-                if error != nil {
                     self.lastCode = nil
-                    self.lastRequest = nil
                 }
             }
         }
+                
         self.task = task
         task.resume()
     }
     
-    private func makeRequest(code: String) -> URLRequest {  // 19 Функция для создания URLRequest с заданным code.
+    private func makeRequest(code: String) -> URLRequest {
         let unsplashAuthorizePostURLString = "https://unsplash.com/oauth/token"
         var urlComponents = URLComponents(string: unsplashAuthorizePostURLString)!
         urlComponents.queryItems = [

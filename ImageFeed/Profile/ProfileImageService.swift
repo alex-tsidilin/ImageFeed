@@ -5,12 +5,13 @@ final class ProfileImageService {
     
     static let shared = ProfileImageService()
     private (set) var avatarURL: String?
-    let profileStorage = ProfileStorage()
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     private var lastToken: String?
     private var lastUsername: String?
     private var profileImage: ProfileImage?
+    
+    static let DidChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
     struct ProfileImage: Codable {
         let profileImage: ImageSize
@@ -42,49 +43,31 @@ final class ProfileImageService {
         let task = urlSession.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
 
-                guard let data = data else {
-                    print("Нет данных")
-                    return
-                }
-
-                print("получаем данные \(data)")
-                print(String(data: data, encoding: .utf8))
+                guard let data = data else { return }
 
                 do {
                     let json = try JSONDecoder().decode(ProfileImage.self, from: data)
-                    print("получаем такой json \(json)")
 
-                    guard let profile = json.profileImage.small else { return }
-                    self.avatarURL = profile
-                    self.profileStorage.image = profile
-                    print("Получили ссылку на автарку \(profile)")
+                    guard let profileImageURL = json.profileImage.small else { return }
+                    self.avatarURL = profileImageURL
+                    print("Получили ссылку на автарку \(profileImageURL)")
 
-                    completion(.success(profile))
-                
-                } catch let DecodingError.dataCorrupted(context) {
-                    print(context)
-                } catch let DecodingError.keyNotFound(key, context) {
-                    print("Key '\(key)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.valueNotFound(value, context) {
-                    print("Value '\(value)' not found:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch let DecodingError.typeMismatch(type, context)  {
-                    print("Type '\(type)' mismatch:", context.debugDescription)
-                    print("codingPath:", context.codingPath)
-                } catch {
-                    print("error: ", error)
+                    completion(.success(profileImageURL))
                     
+                    NotificationCenter.default
+                        .post(
+                            name: ProfileImageService.DidChangeNotification,
+                            object: self,
+                            userInfo: ["URL": profileImageURL])
                 
                 } catch let error {
-                    print("Поймали error")
-                    print("Failed to parse: \(error.localizedDescription)")
                     completion(.failure(error))
                 }
                 
                 self.task = nil
                 if error != nil {
                     self.lastToken = nil
+                    self.lastUsername = nil
                 }
             }
         }
@@ -94,7 +77,7 @@ final class ProfileImageService {
     
     func requestProfileImage(username: String, token: String) -> URLRequest {
 
-        let unsplashGetProfileImageURLString = Constants.defaultBaseURLString + "users/:" + username
+        let unsplashGetProfileImageURLString = Constants.defaultBaseURLString + "users/" + username
         
         guard let url = URL(string: unsplashGetProfileImageURLString)
             else { fatalError("Failed to create URL") }

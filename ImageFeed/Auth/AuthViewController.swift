@@ -1,6 +1,7 @@
 
 import UIKit
 import ProgressHUD
+import SwiftKeychainWrapper
 
 protocol AuthViewControllerDelegate: AnyObject {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String)
@@ -60,9 +61,10 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 switch result {
                 case .success(let token):
                     print("Мы получили токен \(token)")
-                    self.oAuth2TokenStorage.token = token
+                    let isSuccess = KeychainWrapper.standard.set(token, forKey: "Auth token")
+                    guard isSuccess else { return }
                     self.delegate?.authViewController(self, didAuthenticateWithCode: code)
-                    UIBlockingProgressHUD.dismiss()
+                    //UIBlockingProgressHUD.dismiss()
                     print("Закрываем заглушку с загрузкой 2")
                 case .failure(let error):
                     print(error)

@@ -1,14 +1,16 @@
 
 import UIKit
 import ProgressHUD
+import SwiftKeychainWrapper
 
 final class SplashViewController: UIViewController {
 
     //MARK: - Properties
     
     private let showAuthenticationScreenSegueIdentifier = "ShowAuthenticationScreen"
-    let tokenStorage = OAuth2TokenStorage()
     private let profileService = ProfileService.shared
+    private let profileImageService = ProfileImageService.shared
+    private let profileStorage = ProfileStorage()
 
     //MARK: - LifeCicle
     override func viewWillAppear(_ animated: Bool) {
@@ -22,11 +24,13 @@ final class SplashViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if tokenStorage.token != nil {
-            print("В памяти есть токен \(tokenStorage.token!)")
-            UIBlockingProgressHUD.show()
+        let token: String? = KeychainWrapper.standard.string(forKey: "Auth token")
+        
+        if token != nil {
+            print("В памяти есть токен \(token!)")
+            if isProgressHUDVisible { } else { UIBlockingProgressHUD.show() }
             print("Показываем заглушку с загрузкой 1")
-            self.fetchProfile(token: tokenStorage.token!)
+            self.fetchProfile(token: token!)
             //switchToTabBarController()
         } else {
             print("Токена нет, переключаем на аутентификацию")
@@ -49,21 +53,55 @@ final class SplashViewController: UIViewController {
     
     private func fetchProfile(token: String) {
         profileService.fetchProfile(token: token) { [weak self] result in
+            
             guard let self = self else {
                 UIBlockingProgressHUD.dismiss()
-                print("Закрываем заглушку с загрузкой 1c")
+                print("Закрываем заглушку с загрузкой 1A")
                 return
             }
             
             switch result {
-            case .success:
-                self.switchToTabBarController()
-                UIBlockingProgressHUD.dismiss()
-                print("Закрываем заглушку с загрузкой 1a")
+            case .success(let profile):
+                
+                let isSuccessUsername = KeychainWrapper.standard.set(profile.username, forKey: "Username")
+                let isSuccessLoginName = KeychainWrapper.standard.set(profile.loginName, forKey: "LoginName")
+                let isSuccessName = KeychainWrapper.standard.set(profile.name, forKey: "Name")
+                let isSuccessBio = KeychainWrapper.standard.set(profile.bio ?? "", forKey: "Bio")
+                guard isSuccessUsername, isSuccessLoginName, isSuccessName, isSuccessBio else { return }
+                
+                self.profileImageService.fetchProfileImageURL(username: profile.username, token: token) { [weak self] result in
+                    
+                    switch result {
+                    
+                    case .success(let profileImage):
+                        guard let self = self else {
+                            UIBlockingProgressHUD.dismiss()
+                            print("Закрываем заглушку с загрузкой 1B")
+                            return
+                        }
+                        
+                        let isSuccessImage = KeychainWrapper.standard.set(profileImage, forKey: "ImageURL")
+                        guard isSuccessImage else { return }
+                        
+                        self.switchToTabBarController()
+                        UIBlockingProgressHUD.dismiss()
+                        print("Закрываем заглушку с загрузкой 1C")
+                                                
+                    case .failure:
+                        
+                        guard let self = self else { return }
+                        self.showAlert()
+                        UIBlockingProgressHUD.dismiss()
+                        print("Закрываем заглушку с загрузкой 1D")
+                                                
+                        break
+                    }
+                }
+                
             case .failure:
+                self.showAlert()
                 UIBlockingProgressHUD.dismiss()
-                print("Закрываем заглушку с загрузкой 1b")
-                // TODO [Sprint 11] Показать ошибку
+                print("Закрываем заглушку с загрузкой 1F")
                 break
             }
         }
@@ -88,7 +126,28 @@ extension SplashViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
+        viewDidAppear(true)
+        //switchToTabBarController()
+    }
+}
+
+extension SplashViewController {
+    private func showAlert() {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так(",
+            message: "Не удалось войти в систему",
+            preferredStyle: .alert)
+        
+        let action = UIAlertAction(
+            title: "Ок",
+            style: .cancel,
+            handler: { _ in
+                alert.dismiss(animated: true, completion: nil)
+            })
+        
+        alert.addAction(action)
+        self.present(alert, animated: true, completion: nil)
+        }
     }
 
-}
+

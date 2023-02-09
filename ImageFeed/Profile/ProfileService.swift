@@ -5,10 +5,7 @@ final class ProfileService {
     
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
-    private(set) var profile: Profile?
     private var lastToken: String?
-    let profileStorage = ProfileStorage()
-    
     static let shared = ProfileService()
     
     func fetchProfile(token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
@@ -33,11 +30,6 @@ final class ProfileService {
                         loginName: "@\(json.username)",
                         bio: json.bio
                     )
-                    self.profile = profile
-                    self.profileStorage.username = profile.username
-                    self.profileStorage.name = profile.name
-                    self.profileStorage.loginName = profile.loginName
-                    self.profileStorage.bio = profile.bio
                     completion(.success(profile))
                 } catch let error {
                     completion(.failure(error))
