@@ -2,6 +2,7 @@
 import UIKit
 import ProgressHUD
 import SwiftKeychainWrapper
+import SwiftUI
 
 final class SplashViewController: UIViewController {
 
@@ -42,19 +43,16 @@ final class SplashViewController: UIViewController {
         
         if token != nil {
             print("В памяти есть токен \(token!)")
-            if isProgressHUDVisible { } else { UIBlockingProgressHUD.show() }
+            if !isProgressHUDVisible { UIBlockingProgressHUD.show() }
             print("Показываем заглушку с загрузкой 1")
             self.fetchProfile(token: token!)
-            //switchToTabBarController()
         } else {
             print("Токена нет, переключаем на аутентификацию")
             let storyboard = UIStoryboard(name: "Main", bundle: .main)
             guard let authViewController = storyboard.instantiateViewController(withIdentifier: "AuthViewController") as? AuthViewController else { return }
-            //let authViewController = AuthViewController()
             authViewController.delegate = self
             authViewController.modalPresentationStyle = .fullScreen
             present(authViewController, animated: true)
-            //performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
     }
     
@@ -96,26 +94,31 @@ final class SplashViewController: UIViewController {
                     case .success(let profileImage):
                         guard let self = self else {
                             UIBlockingProgressHUD.dismiss()
-                            print("Закрываем заглушку с загрузкой 1B")
+                            print("Self не существует. Закрываем заглушку с загрузкой 1B")
                             return
                         }
                         
                         let isSuccessImage = KeychainWrapper.standard.set(profileImage, forKey: "ImageURL")
-                        guard isSuccessImage else { return }
+                        guard isSuccessImage else {
+                            UIBlockingProgressHUD.dismiss()
+                            print("Не получилось установить аватар. Закрываем заглушку с загрузкой 1E")
+                            return
+                        }
                         
                         self.switchToTabBarController()
-                        UIBlockingProgressHUD.dismiss()
-                        print("Закрываем заглушку с загрузкой 1C")
+//                        UIBlockingProgressHUD.dismiss()
+//                        print("Закрываем заглушку с загрузкой 1C")
                                                 
                     case .failure:
                         
                         guard let self = self else { return }
                         self.showAlert()
-                        UIBlockingProgressHUD.dismiss()
-                        print("Закрываем заглушку с загрузкой 1D")
-                                                
+//                        UIBlockingProgressHUD.dismiss()
+//                        print("Закрываем заглушку с загрузкой 1D")
                         break
                     }
+                    UIBlockingProgressHUD.dismiss()
+                    print("Закрываем заглушку с загрузкой MAIN")
                 }
                 
             case .failure:
@@ -137,25 +140,19 @@ final class SplashViewController: UIViewController {
 
 
 //MARK: - Extensions
-//extension SplashViewController {
-//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-//        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-//            guard
-//                let navigationController = segue.destination as? UINavigationController,
-//                let viewController = navigationController.viewControllers[0] as? AuthViewController
-//            else {fatalError("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")}
-//            viewController.delegate = self
-//        } else {
-//            super.prepare(for: segue, sender: sender)
-//        }
-//    }
-//}
 
 extension SplashViewController: AuthViewControllerDelegate {
     func authViewController(_ vc: AuthViewController, didAuthenticateWithCode code: String) {
         vc.dismiss(animated: true)
-        viewDidAppear(true)
-        //switchToTabBarController()
+        
+        let token: String? = KeychainWrapper.standard.string(forKey: "Auth token")
+        guard let token = token else {
+            print("Токен не найден")
+            return
+        }
+
+        fetchProfile(token: token)
+        
     }
 }
 
